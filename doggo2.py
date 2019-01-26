@@ -24,6 +24,7 @@ from sklearn.decomposition import PCA
 from sklearn.metrics import roc_curve, auc, accuracy_score
 from numpy import array
 
+os.chdir("C:\\Users\\Rhiannon\\Documents\\GitHub\\IC-Hack19")
 #%% - Loading in labels to reference picture dataset
 #Load dataframe with labels and image names
 labels = pd.read_csv("labels.csv", index_col=0)
@@ -80,9 +81,11 @@ def create_features(img):
     return flat_features
 
 #%% create feature matrix
+
+def create_feature_files(label_dataframe):
     
-def create_feature_matrix(label_dataframe):
     features_list = []
+    
     n = 0
     for img_id in label_dataframe.index:
         # load image
@@ -94,15 +97,40 @@ def create_feature_matrix(label_dataframe):
         # get features for image
         image_features = create_features(img)
         features_list.append(image_features)
-        #just to check stuff is the right len: 
-        #print(len(image_features))
-        #only run the print for first time and stop it
+        
         n = n + 1
-        if n % 1000 == 0:
+        if n % 269 == 0:
             print(n)
+            filename = "E:/feature_files/array_num" + str(n) + ".npy"
+            feature_matrix = np.array(features_list)
+            np.save(filename, feature_matrix)
+            features_list = []
     # convert list of arrays into a matrix
+  
+#%%stick nparrays together...  
+    
+filename_array = []
+for i in range(1,39):
+    filename = "array_num" + str(n*269) + ".npy"
+    
+
+def stick_nparrays(filename_array):
+    n = 0
+    numpys_to_add = numpy.empty()
+    for file in filename_array:
+        n = n + 1
+        new_numpy = numpy.load(file)
+        np.concatenate((numpys_to_add, new_numpy))
+
+#%%
+def create_feature_matrix(label_dataframe)    
+    features_list = np.load("feature_numpy.npy")
     feature_matrix = np.array(features_list)
     return feature_matrix
+
+#%% run files
+    
+create_feature_files(labels)
 
 #%% Run feature matrix 
 feature_matrix = create_feature_matrix(labels)
